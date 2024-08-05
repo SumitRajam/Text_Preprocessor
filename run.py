@@ -1,12 +1,6 @@
 import tkinter as tk
 from tkinter import scrolledtext
-from functions.tokenize_script import tokenize_text
-from functions.stem_script import stem_text
-from functions.lemmatize_script import lemmatize_text
-from functions.pos_tagging import tag_text
-from functions.tenses import determine_tense
-from functions.clauses import identify_clauses
-from functions.voices_script import check_voices
+from functions import tokenize_text, check_voices, lemmatize_text, stem_text, tag_text, extract_clauses, process_text1
 
 def process_text(action):
     """Process the text input based on the selected action."""
@@ -19,8 +13,8 @@ def process_text(action):
         'stem': stem_text,
         'lemmatize': lemmatize_text,
         'pos': tag_text,
-        'tenses': determine_tense,
-        'clauses': identify_clauses,
+        'tenses': process_text1,
+        'clauses': extract_clauses,
         'voices': check_voices
     }
     if action in actions:
