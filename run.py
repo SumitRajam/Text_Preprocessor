@@ -1,24 +1,12 @@
 import tkinter as tk
 from tkinter import scrolledtext
-import subprocess
-import os
-
-# Define the path to the functions folder
-FUNCTIONS_DIR = 'functions'
-
-def run_script(script_name, user_input):
-    """Run the script with the provided input from the functions folder."""
-    script_path = os.path.join(FUNCTIONS_DIR, script_name)
-    result = subprocess.run(
-        ['python', script_path, user_input],
-        capture_output=True,
-        text=True,
-        shell=False  # Set to False to avoid shell injection issues
-    )
-    # Check for errors and return output
-    if result.returncode != 0:
-        return f"Error: {result.stderr}"
-    return result.stdout
+from functions.tokenize_script import tokenize_text
+from functions.stem_script import stem_text
+from functions.lemmatize_script import lemmatize_text
+from functions.pos_tagging import tag_text
+from functions.tenses import determine_tense
+from functions.clauses import identify_clauses
+from functions.voices_script import check_voices
 
 def process_text(action):
     """Process the text input based on the selected action."""
@@ -26,16 +14,19 @@ def process_text(action):
     if not user_input:
         show_message("Please enter input text.", fg="red")
         return
-    scripts = {
-        'tokenize': 'tokenize_script.py',
-        'stem': 'stem_script.py',
-        'lemmatize': 'lemmatize_script.py',
-        'pos': 'pos_tagging.py',
-        'entity': 'entity_recognition_script.py',
-        'relation': 'relation_recognition_script.py'
+    actions = {
+        'tokenize': tokenize_text,
+        'stem': stem_text,
+        'lemmatize': lemmatize_text,
+        'pos': tag_text,
+        'tenses': determine_tense,
+        'clauses': identify_clauses,
+        'voices': check_voices
     }
-    if action in scripts:
-        output = run_script(scripts[action], user_input)
+    if action in actions:
+        func = actions[action]
+        output = func(user_input)
+        print(f"Debug Output:\n{output}")  # Debug: Print output to console
         output_text.config(state=tk.NORMAL)  # Make text widget editable to insert text
         output_text.delete(1.0, tk.END)  # Clear the previous output
         output_text.insert(tk.END, output)  # Insert the new output
@@ -76,11 +67,10 @@ def show_message(message, fg="black"):
     output_text.delete(1.0, tk.END)  # Clear previous content
     output_text.insert(tk.END, message)  # Insert message
     output_text.config(state=tk.DISABLED)  # Make text widget non-editable
-    output_text.tag_configure("error", foreground="red")  # Configure error tag
 
 # Create the main window
 root = tk.Tk()
-root.title("Text Processing Tool")
+root.title("Text Preprocesser")
 root.geometry("800x500")  # Initial size of the window
 
 # Set the minimum size for the window
@@ -111,8 +101,9 @@ buttons = [
     ('Stem', 'stem'),
     ('Lemmatize', 'lemmatize'),
     ('POS Tagging', 'pos'),
-    ('Entity Recognition', 'entity'),
-    ('Relation Recognition', 'relation')
+    ('Tenses', 'tenses'),
+    ('Clauses', 'clauses'),
+    ('Voices', 'voices')
 ]
 
 # Calculate minimum button width for display

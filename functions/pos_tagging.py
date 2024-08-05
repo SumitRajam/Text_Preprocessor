@@ -1,4 +1,3 @@
-import sys
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk import pos_tag
@@ -38,18 +37,8 @@ tag_map = {
     'DT': 'Determiner',
     'TO': 'Infinitive marker',
     'PRP$': 'Possessive pronoun',
-    'JJ': 'Adjective',
-    'PRP': 'Personal pronoun',
-    'NN': 'Noun',
-    'NP': 'Proper Noun',
-    'NUM': 'Number',
-    'PRO': 'Pronoun',
-    'P': 'Preposition',
     'UH': 'Interjection',
     'V': 'Verb',
-    'VD': 'Past Tense',
-    'VG': 'Present Participle',
-    'VN': 'Past Participle',
     'WH': 'WH Determiner'
 }
 
@@ -58,14 +47,7 @@ def tag_text(text):
     tagged = pos_tag(tokens)
     # Convert tags to full forms and filter out punctuation
     tagged_full = [(word, tag_map.get(tag, tag)) for word, tag in tagged if word.isalpha()]
-    return tagged_full
-
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        input_text = sys.argv[1]
-        tagged_output = tag_text(input_text)
-        # Print the tagged output in a format suitable for the Tkinter GUI
-        for word, tag in tagged_output:
-            print(f"{word}: {tag}")
-    else:
-        print("No input text provided.")
+    
+    # Format as 'word -> POS tag'
+    formatted_output = '\n'.join(f"{word} -> {tag}" for word, tag in tagged_full)
+    return formatted_output
