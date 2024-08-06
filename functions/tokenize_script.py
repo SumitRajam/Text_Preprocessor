@@ -1,9 +1,6 @@
 import sys
-import nltk
 from nltk.tokenize import word_tokenize
 
-# Download required NLTK data
-nltk.download('punkt')
 
 def tokenize_text(text):
     # Tokenize the input text

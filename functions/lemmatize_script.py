@@ -5,10 +5,6 @@ from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 import string
 
-# Download required NLTK data
-nltk.download('punkt')
-nltk.download('wordnet')
-nltk.download('averaged_perceptron_tagger')
 
 def get_wordnet_pos(treebank_tag):
     """Convert treebank tags to WordNet POS tags"""

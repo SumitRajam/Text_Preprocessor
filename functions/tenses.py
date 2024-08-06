@@ -1,15 +1,11 @@
-import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk import pos_tag
 
-# Download required NLTK data
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
 
 def determine_tense(sentence):
     """Determine the tense of the given sentence."""
     tokens = word_tokenize(sentence)
-    print(tokens)
+    # print(tokens)
     pos_tags = pos_tag(tokens)
 
     # Initialize tense info
@@ -35,7 +31,7 @@ def determine_tense(sentence):
         for string in tokens:
             if "ing" in string:
                 tense_info['continuous'] = True
-                print("foo")
+                # print("foo")
                 
         if 'will' in tokens or 'Will' in tokens or 'Shall' in tokens or 'shall' in tokens:
             tense_info['future'] = True

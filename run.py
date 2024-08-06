@@ -20,7 +20,7 @@ def process_text(action):
     if action in actions:
         func = actions[action]
         output = func(user_input)
-        print(f"Debug Output:\n{output}")  # Debug: Print output to console
+        # print(f"Debug Output:\n{output}")  # Debug: Print output to console
         output_text.config(state=tk.NORMAL)  # Make text widget editable to insert text
         output_text.delete(1.0, tk.END)  # Clear the previous output
         output_text.insert(tk.END, output)  # Insert the new output

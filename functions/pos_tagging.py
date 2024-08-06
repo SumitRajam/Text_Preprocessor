@@ -1,10 +1,6 @@
-import nltk
 from nltk.tokenize import word_tokenize
 from nltk import pos_tag
 
-# Download required NLTK data
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
 
 # Define tag-to-full-form mapping
 tag_map = {
