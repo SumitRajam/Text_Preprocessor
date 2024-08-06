@@ -1,24 +1,82 @@
-from nltk.tokenize import sent_tokenize, word_tokenize
+import re
+from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk import pos_tag
+import nltk
 
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+def extract_sentences(text):
+    """Extract sentences from the given text."""
+    return sent_tokenize(text)
+
+def split_sentence_at_tags(sentence):
+    """Split a sentence into clauses based on WH-words, prepositions, conjunctions, and punctuation."""
+    tokens = word_tokenize(sentence)
+    tagged_tokens = pos_tag(tokens)
+    
+    pattern = r'\s+(who|whom|whose|which|that|where|when|why|if|although|because|since|unless|while|during|for|in|on|at|by|with|and|but|or|nor|so|yet)\s+|(?<!\w)([.,])|(\s+--\s+)'
+    
+    sentence_str = ' '.join(tokens)
+    clauses = re.split(pattern, sentence_str, flags=re.IGNORECASE)
+    clauses = [clause.strip() for clause in clauses if clause and clause.strip()]
+    
+    return clauses
+
+def is_subordinate_clause(clause):
+    """Check if a clause is a subordinate or adverbial clause."""
+    subordinating_conjunctions = {'although', 'because', 'since', 'if', 'unless', 'while', 'when', 'where', 'why', 'that', 'whom', 'whose', 'which'}
+    adverbial_conjunctions = {'after', 'by the time', 'before', 'due to','when', 'while', 'until', 'as', 'since', 'because', 'although', 'if', 'unless', 'where', 'whether'}
+    
+    tokens = word_tokenize(clause)
+    tagged_tokens = pos_tag(tokens)
+    
+    return any(word.lower() in adverbial_conjunctions for word, tag in tagged_tokens)
+
+def is_meaningful_clause(clause):
+    """Check if a clause contains a subject and predicate."""
+    tokens = word_tokenize(clause)
+    tagged_tokens = pos_tag(tokens)
+    
+    has_verb = any(tag.startswith('VB') for word, tag in tagged_tokens)
+    has_subject = any(tag in ('NN', 'NNS', 'NNP', 'NNPS', 'PRP', 'PRP$') for word, tag in tagged_tokens)
+    
+    return has_verb and has_subject
+
+def analyze_clauses(text):
+    """Analyze and return main, subordinate, and adverbial clauses, and determine the tense of main clauses."""
+    sentences = extract_sentences(text)
+    main_clauses = []
+    subordinate_clauses = []
+    adverbial_clauses = []
+    
+    for sentence in sentences:
+        clauses = split_sentence_at_tags(sentence)
+        for clause in clauses:
+            if 'by the time' in clause.lower() or 'due to' in clause.lower():
+                adverbial_clauses.append(clause)
+                continue
+            if is_subordinate_clause(clause):
+                if any(word.lower() in {'when', 'where', 'why', 'how', 'to what extent'} for word, tag in pos_tag(word_tokenize(clause))):
+                    adverbial_clauses.append(clause)
+                else:
+                    subordinate_clauses.append(clause)
+            elif is_meaningful_clause(clause):
+                main_clauses.append(clause)
+    
+    return main_clauses, subordinate_clauses, adverbial_clauses
 
 def determine_tense(sentence):
     """Determine the tense of the given sentence."""
     tokens = word_tokenize(sentence)
-    # print(tokens)
     pos_tags = pos_tag(tokens)
 
-    # Initialize tense info
-    tense_info = {
-        'present': False, 'past': False, 'future': False,
-        'continuous': False, 'perfect': False, 'conditional': False
-    }
+    tense_info = {'present': False, 'past': False, 'future': False,
+                  'continuous': False, 'perfect': False, 'conditional': False}
 
-    # Check for conditionals
     if 'if' in tokens and any(word in tokens for word in ['had', 'were', 'would', 'should']):
         tense_info['conditional'] = True
 
-    # Extract main verb and its tag
     main_verb = None
     for word, tag in pos_tags:
         if tag.startswith('V'):
@@ -89,46 +147,10 @@ def determine_tense(sentence):
         return "Unknown Tense"
 
 def process_text1(text):
-    """Process the input text and return the tense of each sentence."""
-    sentences = sent_tokenize(text)
-    results = []
-    for sentence in sentences:
-        tense = determine_tense(sentence)
-        results.append(f"{sentence} -> {tense}")
-    return '\n'.join(results)
-
-# Futur tense test:
-# text = "She will complete her assignment tomorrow."
-# print(process_text1(text))
-# text1 = "Will you be attending the conference tomorrow?"
-# print(process_text1(text1))
-# text2 = "By the end of this year, they will have finished the construction."
-# print(process_text1(text2)) 
-# text3 = "By next year, I will have been studying here for five years."
-# print(process_text1(text3)) 
-
-# Present tense test cases
-# text4 = "She completes her assignment every day."
-# print(process_text1(text4))  # Simple Present Tense
-
-# text5 = "She is completing her assignment right now."
-# print(process_text1(text5))  # Present Continuous Tense
-
-# text6 = "Before i asked her, she have completed her assignment."
-# print(process_text1(text6))  # Present Perfect Tense
-
-# text7 = "She have been working here for three years."
-# print(process_text1(text7))  # Present Perfect Continuous Tense
-
-# # Past tense test cases
-# text8 = "She completed her assignment yesterday."
-# print(process_text1(text8))  # Simple Past Tense
-
-# text9 = "She was completing her assignment when the power went out."
-# print(process_text1(text9))  # Past Continuous Tense
-
-# text10 = "By the time you arrived, she had completed her assignment."
-# print(process_text1(text10))  # Past Perfect Tense
-
-# text11 = "By last year, she had been working here for five years."
-# print(process_text1(text11))  # Past Perfect Continuous Tense 
+    """Process text to extract main clauses and their tenses."""
+    main_clauses, _, _ = analyze_clauses(text)
+    result = []
+    for clause in main_clauses:
+        tense = determine_tense(clause)
+        result.append(f"{clause} -> {tense}")
+    return "\n".join(result)
