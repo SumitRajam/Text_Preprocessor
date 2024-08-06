@@ -34,5 +34,5 @@ def check_voices(text):
         return "No verbs found"
 
 # Example usage
-text = "The cake was eaten by the children."
-print(check_voices(text))
+# text = "The cake was eaten by the children."
+# print(check_voices(text))
