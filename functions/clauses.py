@@ -76,7 +76,7 @@ def extract_clauses(text):
         result.append(f"{clause} -> Subordinate Clause")
     
     for clause in adverbial_clauses:
-        result.append(f"{clause} -> adverbial_clauses")
+        result.append(f"{clause} -> Adverbial_clauses")
     
     return "\n".join(result)
 
