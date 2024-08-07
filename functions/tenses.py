@@ -3,8 +3,6 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk import pos_tag
 import nltk
 
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
 
 def extract_sentences(text):
     """Extract sentences from the given text."""
